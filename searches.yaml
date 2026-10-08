@@ -1,0 +1,15 @@
+# SEARCH ACROSS ALL COMPANIES, so you also find employers you have never heard of.
+# Needs the free Adzuna key (see README). Delete this file to switch it off.
+adzuna:
+  # Country codes: de Germany, nl Netherlands, ch Switzerland, at Austria, gb United Kingdom,
+  # fr France, es Spain, it Italy, be Belgium, pl Poland, us United States, ca Canada,
+  # au Australia, in India, sg Singapore (and a few more: see jobwatch/sources/adzuna.py)
+  countries: [de]
+
+  # Each line is a separate search. All words in a line must appear in the listing.
+  queries:
+    - data scientist
+    - machine learning
+
+  max_pages: 2       # 50 results per page
+  max_days_old: 14   # ignore listings older than this

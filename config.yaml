@@ -1,0 +1,35 @@
+# WHAT COUNTS AS A RELEVANT JOB. Edit this file, then press "Commit changes".
+#
+# Rules
+#   - Not case-sensitive. Whole words only: "ml" matches "ML Engineer", not "HTML".
+#   - A trailing * matches longer words: "data scien*" matches "Data Scientist" and "Data Science".
+#   - A job is kept if ANY title_include word is in its title (or ANY description_include word
+#     is in its description) ...
+#   - ... and is then dropped if its title has ANY title_exclude word, its company is in
+#     company_exclude, or its location has ANY location_exclude word.
+#   - If locations is not empty, the job's location must match ANY entry in it.
+#   - english_only: true skips listings that clearly read as German, Dutch or French.
+
+title_include:
+  - data scien*
+  - machine learning
+  - python
+
+description_include: []
+
+title_exclude:
+  - intern*
+  - trainee*
+  - student*
+  - sales
+  - recruit*
+
+company_exclude: []
+
+# Leave empty for no location filter. Example: [Germany, Berlin, Europe]
+locations: []
+
+# Example: [US, USA, United States]
+location_exclude: []
+
+english_only: false

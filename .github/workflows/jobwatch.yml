@@ -1,0 +1,59 @@
+name: jobwatch
+
+on:
+  schedule:
+    - cron: "0 6 * * *"   # every day at 06:00 UTC. Change the first two numbers to shift the time
+  workflow_dispatch:       # adds a "Run workflow" button in the Actions tab
+    inputs:
+      dry_run:
+        description: "Preview only: show matches, send and save nothing"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write          # needed to save jobs.sqlite back to the repository
+
+concurrency:
+  group: jobwatch          # never run two copies at once
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Run jobwatch
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          JOBWATCH_SHEET_ID: ${{ secrets.JOBWATCH_SHEET_ID }}
+          ADZUNA_APP_ID: ${{ secrets.ADZUNA_APP_ID }}
+          ADZUNA_APP_KEY: ${{ secrets.ADZUNA_APP_KEY }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+        run: python -m jobwatch ${{ inputs.dry_run && '--dry-run' || '' }}
+
+      - name: Save state
+        if: always()       # save even when a source failed, so nothing is repeated tomorrow
+        run: |
+          git config user.name "jobwatch"
+          git config user.email "jobwatch@users.noreply.github.com"
+          git add jobs.sqlite
+          if git diff --cached --quiet; then
+            echo "No changes to save."
+          else
+            git commit -m "Update job state"
+            git pull --rebase
+            git push
+          fi

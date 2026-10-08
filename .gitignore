@@ -1,0 +1,8 @@
+# Personal files: never commit or share these
+.env
+*.json
+.venv/
+__pycache__/
+.pytest_cache/
+
+.DS_Store
